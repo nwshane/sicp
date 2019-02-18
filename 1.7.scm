@@ -28,8 +28,12 @@
 ; then return the guess.
 (define (sqrt-new x)
     (define (good-enough? guess x)
-        (< (abs (/ guess (improve guess x)))
-            1.000000001))
+        (define fraction-change (/ guess (improve guess x)))
+        (define fraction-change-above-one
+            (if (< fraction-change 1)
+                (/ 1 fraction-change)
+                fraction-change))
+        (< fraction-change-above-one 1.001))
     (sqrt-iter 1.0 x good-enough?))
 
 ; Generalized method for testing examples with
@@ -40,14 +44,14 @@
        (define sqrt-val (sqrt (square x)))
        (define sqrt-new-val (sqrt-new (square x)))
        (newline)
-       (display "(sqrt ")
+       (display "(sqrt (square ")
        (display x)
-       (display "): ")
+       (display ")): ")
        (display sqrt-val)
        (newline)
-       (display "(sqrt-new ")
+       (display "(sqrt-new (square ")
        (display x)
-       (display "): ")
+       (display ")): ")
        (display sqrt-new-val)
        (define sqrt-val-diff (abs (- sqrt-val x)))
        (define sqrt-new-val-diff (abs (- sqrt-new-val x)))
@@ -59,21 +63,14 @@
 
 (test-example 0.0000000004)
 (test-example 0.001)
-(test-example 43214432)
-(test-example 400)
-(test-example 5)
-(test-example 1.3)
 (test-example 0.1)
-(test-example 0.9999)
-(test-example 1.0001)
-(test-example 1.0004)
-(test-example 1.0005)
-(test-example 1.0006)
-(test-example 1.0007)
-(test-example 1.0009)
-(test-example 1.001)
-(test-example 1.01)
-(test-example 1.1)
+(test-example 1.3)
+(test-example 5)
+(test-example 400)
+(test-example 4000)
+(test-example 4000)
+(test-example 40000)
+(test-example 43214432)
 
 ; Question: Why is the original good-enough? function inaccurate
 ; for large numbers?
@@ -95,6 +92,5 @@
 ;
 ; It seems like good-enough? is better for large numbers,
 ; and good-enough-new? is better for small numbers. However,
-; I don't understand why sqrt-new always outputs 1 for
-; large numbers, and I also don't understand why the textbook
-; is implying that original sqrt doesn't work for large numbers.
+; I don't understand why the textbook
+; implies that original sqrt doesn't work for large numbers.
