@@ -4,32 +4,33 @@
 (define (improve guess x)
   (average guess (/ x guess)))
 
-; The original good-enough? function
-(define (good-enough? guess x)
-  (< (abs (- (square guess) x)) 0.001))
-
-(define (sqrt-iter guess x)
+(define (sqrt-iter guess x good-enough?)
   (if (good-enough? guess x)
       guess
       (sqrt-iter (improve guess x)
-                 x)))
+                  x
+                  good-enough?)))
 
+; Compute the square root in the original way: determine
+; whether a guess is good enough by looking at the absolute
+; value of the difference between the target and the square
+; of the guess. If the difference is below a certain threshold,
+; then return the guess.
 (define (sqrt x)
-    (sqrt-iter 2.0 x))
+    (define (good-enough? guess x)
+        (< (abs (- (square guess) x)) 0.001))
+    (sqrt-iter 1.0 x good-enough?))
 
-; The new good-enough? function
-(define (good-enough-new? guess x)
-    (< (abs (/ guess (improve guess x)))
-        1.000000001))
-
-(define (sqrt-iter-new guess x)
-  (if (good-enough-new? guess x)
-      guess
-      (sqrt-iter-new (improve guess x)
-                 x)))
-
+; Compute the square root in the new way: determine
+; whether a guess is good enough by looking at the
+; fraction change from the guess to the improved guess.
+; If the fraction change is below a certain threshold,
+; then return the guess.
 (define (sqrt-new x)
-    (sqrt-iter-new 2.0 x))
+    (define (good-enough? guess x)
+        (< (abs (/ guess (improve guess x)))
+            1.000000001))
+    (sqrt-iter 1.0 x good-enough?))
 
 ; Generalized method for testing examples with
 ; both the original and new sqrt methods and
